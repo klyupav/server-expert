@@ -99,7 +99,7 @@ class WP
      */
     private function updateProduct(array $product, int $pid)
     {
-//        return $this->updatePostMeta(['related' => @$product['related']], $pid);
+        return $this->updatePostMeta(['price' => @$product['price']], $pid);
     }
 
     /*
@@ -356,27 +356,10 @@ class WP
      */
     private function updatePostMeta(array $param, int $pid)
     {
-        if (isset($param['related']))
+        foreach ($param as $key => $value)
         {
-            $related_ids = [];
-            $arts = explode(',', $param['related']);
-            foreach ($arts as $art)
-            {
-                if($find = $this->findProductIdByArticle(trim($art)))
-                {
-                    $related_ids[] = $find;
-                }
-            }
-            $meta = [
-                '_wcrp_related_ids' => isset($related_ids) && !empty($related_ids) ? serialize($related_ids) : '',
-            ];
-            foreach ($meta as $key => $value)
-            {
-                $this->conn->update('wp_postmeta', ['meta_value' => $value], ['post_id' => $pid, 'meta_key' => $key]);
-            }
-            return true;
+            $this->conn->update('wp_postmeta', ['meta_value' => $value], ['post_id' => $pid, 'meta_key' => $key]);
         }
-        return false;
     }
 
     /*

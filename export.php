@@ -46,6 +46,8 @@ $exporter = new \App\ParseIt\export\openCartExporter($remoteConn);
 $sql = "SELECT * FROM parseit WHERE parsed != 1";
 $stmt = $conn->query($sql);
 
+//Категории (меню) парсить кроме: Серверные платформы, Сетевое оборудование, Прочее.
+
 if ($stmt->rowCount())
 {
     $fetches = $stmt->fetchAll();
@@ -54,8 +56,23 @@ if ($stmt->rowCount())
         $product_id = $fetch['product_id'];
         $row = $exporter->getProductRow($product_id);
         $product = $exporter->getAllProductInfo($row);
+        $conn->query("UPDATE `parseit` SET `parsed` = '1' WHERE `product_id` = {$product_id};");
+//        $product['categories'][] = 'Серверные платформы';
 
-//        print_r($product);die();
+        if ("Серверные платформы" == trim($product['categories'][0]))
+        {
+            continue;
+        }
+        if ("Сетевое оборудование" == trim($product['categories'][0]))
+        {
+            continue;
+        }
+        if ("Прочее" == trim($product['categories'][0]))
+        {
+            continue;
+        }
+//        print_r($product);die('net');
+
         $wp->addProduct([
             'article' => $product['sku'],
             'images' => $product['gallery'],
@@ -65,7 +82,7 @@ if ($stmt->rowCount())
             'category' => $product['categories'],
             'attr' => $product['attributes'],
         ]);
-        $conn->query("UPDATE `parseit` SET `parsed` = '1' WHERE `product_id` = {$product_id};");
+
 //        break;
         if (time() - $start > $time_limit - 10)
         {
@@ -73,3 +90,6 @@ if ($stmt->rowCount())
         }
     }
 }
+
+$wp->conn->delete('wp_options', ['option_value' => '_transient_wc_term_counts']);
+$tree = $wp->updateCategoryTree();
