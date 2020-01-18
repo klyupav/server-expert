@@ -118,7 +118,9 @@ class WP
         $post_name = preg_replace('%[\-]+%uis', '-', $post_name);
         $post_name = mb_substr($post_name, 0, 29);
         $post_name .=  "-" . mb_strtolower(@$product['article']);
+        $post_name = preg_replace('%[\ ]+%uis', '-', $post_name);
         $post_name = preg_replace('%[\-]+%uis', '-', $post_name);
+        $post_name = trim($post_name, '-');
 
         $param = [
             'post_author' => '1',
@@ -555,6 +557,7 @@ class WP
     private function copyImageToUpload(string $src, string $article = '')
     {
         $file = str_replace(' ', '-', basename($src));
+        $article = str_replace(' ', '_', basename($article));
         $upload_dir = $this->upload_dir."by_sku/{$article}/";
         $dir = $this->site_root_dir.$upload_dir;
         if (!file_exists($dir))

@@ -74,10 +74,10 @@ if ($stmt->rowCount())
 //        print_r($product);die('net');
 
         $wp->addProduct([
-            'article' => $product['sku'],
+            'article' => empty($product['sku']) ? $product['model'] : $product['sku'],
             'images' => $product['gallery'],
             'price' => $product['price'] * 0.96,
-            'name' => $product['model'],
+            'name' => $product['name'],
             'desc' => $product['description'],
             'category' => $product['categories'],
             'attr' => $product['attributes'],

@@ -34,7 +34,21 @@ class openCartExporter
         $product['gallery'] = $this->getProductImagesByProductId($row['product_id'], $row['image']);
         $product['categories'] = $this->getProductCategory($row['product_id']);
         $product['description'] = $this->getProductDescription($row['product_id']);
+        $product['name'] = $this->getProductName($row['product_id']);
         return $product;
+    }
+
+    private function getProductName($product_id)
+    {
+        $sql = "SELECT * FROM oc_product_description WHERE product_id='{$product_id}' AND language_id=1";
+        $stmt = $this->connection->query($sql);
+        $name = '';
+        if ($stmt->rowCount())
+        {
+            $row = $stmt->fetch();
+            $name = $row['name'];
+        }
+        return $name;
     }
 
     private function getProductDescription($product_id)
